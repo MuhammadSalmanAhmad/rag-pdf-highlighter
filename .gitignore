@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+fastapi-env/
+.venv/
+venv/
+env/
+
+# Tool/cache artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# macOS
+.DS_Store
+
+# Local env files
+.env
+.env.*
