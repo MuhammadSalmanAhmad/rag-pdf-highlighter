@@ -1,4 +1,5 @@
 fastapi
+uvicorn[standard]
 httpx
 langchain-core
 pymupdf
