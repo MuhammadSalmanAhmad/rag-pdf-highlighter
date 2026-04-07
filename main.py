@@ -20,6 +20,11 @@ class HighlightRequest(BaseModel):
     documents: list[DocumentPayload]
 
 
+@app.get("/")
+async def health_check():
+    return {"status": "ok the app is running"}
+
+
 @app.post("/highlight")
 async def highlight(payload: HighlightRequest, background_tasks: BackgroundTasks):
     try:
