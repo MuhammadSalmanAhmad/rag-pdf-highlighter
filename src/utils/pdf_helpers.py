@@ -114,18 +114,16 @@ def _search_collapsed(page: fitz.Page, text: str) -> Rects:
     for start in range(0, len(chunk_collapsed) - fragment_len + 1, step):
         fragment = chunk_collapsed[start : start + fragment_len]
         pos = page_collapsed.find(fragment)
-        if pos == -1:
-            continue
+        while pos != -1:
+            orig_start = _map_collapsed_pos(page_text, pos)
+            orig_end = _map_collapsed_pos(page_text, pos + fragment_len)
 
-        orig_start = _map_collapsed_pos(page_text, pos)
-        orig_end = _map_collapsed_pos(page_text, pos + fragment_len)
+            if orig_start is not None and orig_end is not None:
+                span = page_text[orig_start:orig_end].strip()
+                if span:
+                    rects.extend(page.search_for(span))
 
-        if orig_start is None or orig_end is None:
-            continue
-
-        span = page_text[orig_start:orig_end].strip()
-        if span:
-            rects.extend(page.search_for(span))
+            pos = page_collapsed.find(fragment, pos + 1)
 
     return _dedupe_rects(rects)
 
