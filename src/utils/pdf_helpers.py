@@ -189,10 +189,10 @@ def highlight_chunks_in_pdf(pdf_path: str, documents: list[Document]) -> str:
     if not os.path.exists(pdf_path):
         raise HTTPException(status_code=400, detail=f"PDF not found: {pdf_path}")
 
-    output_path = tempfile.NamedTemporaryFile(
+    output_fd, output_path = tempfile.mkstemp(
         suffix=f"_highlighted{Path(pdf_path).suffix}",
-        delete=False,
-    ).name
+    )
+    os.close(output_fd)
 
     doc = fitz.open(pdf_path)
     total_highlights = 0
