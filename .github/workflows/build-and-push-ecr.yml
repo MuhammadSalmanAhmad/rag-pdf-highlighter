@@ -67,31 +67,37 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           if [[ "$ECR_REPOSITORY" == *".amazonaws.com/"* ]]; then
-            echo "image=$ECR_REPOSITORY" >> "$GITHUB_OUTPUT"
+            image="$ECR_REPOSITORY"
           else
-            echo "image=$ECR_REGISTRY/$ECR_REPOSITORY" >> "$GITHUB_OUTPUT"
+            image="$ECR_REGISTRY/$ECR_REPOSITORY"
           fi
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "image_uri=$image:$GITHUB_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: ${{ steps.ecr-image.outputs.image }}
-          tags: |
-            type=sha,prefix=sha-
-            type=ref,event=branch
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push Docker image
+      - name: Build Docker image
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          load: true
           platforms: linux/amd64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          provenance: true
-          sbom: true
+          tags: ${{ steps.ecr-image.outputs.image_uri }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: ${{ steps.ecr-image.outputs.image_uri }}
+          format: table
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
+          ignore-unfixed: true
+          exit-code: 1
+
+      - name: Push Docker image
+        env:
+          IMAGE_URI: ${{ steps.ecr-image.outputs.image_uri }}
+        run: docker push "$IMAGE_URI"
