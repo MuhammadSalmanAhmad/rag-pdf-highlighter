@@ -14,8 +14,9 @@ from pathlib import Path
 
 import fitz
 import httpx
-from fastapi import HTTPException
 from langchain_core.documents import Document
+
+from src.exceptions import NoDocumentsError, PDFDownloadError, PDFNotFoundError
 
 logger = logging.getLogger("highlight-service.pdf_helpers")
 
@@ -47,10 +48,7 @@ async def download_pdf(url: str) -> str:
     except Exception as exc:
         logger.exception("Failed to download PDF from %s", url)
         cleanup_file(tmp_path)
-        raise HTTPException(
-            status_code=400,
-            detail=f"Failed to download PDF: {exc}",
-        ) from exc
+        raise PDFDownloadError(f"Failed to download PDF: {exc}") from exc
 
     return tmp_path
 
@@ -183,9 +181,9 @@ def highlight_chunks_in_pdf(pdf_path: str, documents: list[Document]) -> str:
     and return the path to a new temporary file with annotations applied.
     """
     if not documents:
-        raise HTTPException(status_code=400, detail="No documents provided")
+        raise NoDocumentsError("No documents provided")
     if not os.path.exists(pdf_path):
-        raise HTTPException(status_code=400, detail=f"PDF not found: {pdf_path}")
+        raise PDFNotFoundError(f"PDF not found: {pdf_path}")
 
     output_fd, output_path = tempfile.mkstemp(
         suffix=f"_highlighted{Path(pdf_path).suffix}",

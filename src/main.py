@@ -5,6 +5,8 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from langchain_core.documents import Document
 from pydantic import BaseModel, Field
+
+from src.exceptions import HighlightError, PDFDownloadError
 from src.utils.pdf_helpers import cleanup_file, download_pdf, highlight_chunks_in_pdf
 
 # ── Configure logging ──────────────────────────────────────────────
@@ -14,7 +16,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("highlight-service")
 
-app = FastAPI()
+app = FastAPI(
+    title="Callisto PDF Highlighter",
+    description="Highlight text chunks in PDFs for RAG pipelines",
+    version="0.1.0",
+)
 
 
 class DocumentPayload(BaseModel):
@@ -28,13 +34,16 @@ class HighlightRequest(BaseModel):
 
 
 @app.get("/")
-async def health_check():
+async def health_check() -> dict[str, str]:
     return {"status": "ok the app is running"}
 
 
 @app.post("/highlight")
-async def highlight(payload: HighlightRequest, background_tasks: BackgroundTasks):
+async def highlight(payload: HighlightRequest, background_tasks: BackgroundTasks) -> FileResponse:
     logger.info("Received /highlight request – %d chunks", len(payload.documents))
+
+    pdf_path: str | None = None
+    output_path: str | None = None
 
     try:
         pdf_path = await download_pdf(payload.pdf_url)
@@ -54,12 +63,20 @@ async def highlight(payload: HighlightRequest, background_tasks: BackgroundTasks
             media_type="application/pdf",
             filename="highlighted.pdf",
         )
+    except PDFDownloadError as exc:
+        if pdf_path:
+            cleanup_file(pdf_path)
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except HighlightError as exc:
+        if pdf_path:
+            cleanup_file(pdf_path)
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except HTTPException:
-        if "pdf_path" in locals():
+        if pdf_path:
             cleanup_file(pdf_path)
         raise
     except Exception as exc:
         logger.exception("Highlighting failed")
-        if "pdf_path" in locals():
+        if pdf_path:
             cleanup_file(pdf_path)
         raise HTTPException(status_code=500, detail=f"Highlighting failed: {exc}") from exc

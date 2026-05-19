@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "callisto-pdf-highlighter"
+version = "0.1.0"
+authors = [
+  { name = "RipeSeed", email = "dev@ripeseed.io" },
+]
+description = "Highlight text chunks in PDFs – a FastAPI microservice for RAG pipelines"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Markup",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+keywords = ["pdf", "highlight", "rag", "langchain", "fastapi", "pymupdf"]
+dependencies = [
+    "fastapi>=0.100",
+    "uvicorn[standard]>=0.20",
+    "httpx>=0.24",
+    "langchain-core>=0.1",
+    "pymupdf>=1.23",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "ruff",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://github.com/RipeSeed/calli-pdf-highlighter-"
+Repository = "https://github.com/RipeSeed/calli-pdf-highlighter-"
+Issues = "https://github.com/RipeSeed/calli-pdf-highlighter-/issues"
+
+# ── Tool configuration ────────────────────────────────────────────
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["test"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]

@@ -2,9 +2,9 @@ import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from fastapi import HTTPException
 from langchain_core.documents import Document
 
+from src.exceptions import NoDocumentsError, PDFDownloadError, PDFNotFoundError
 from src.utils.pdf_helpers import cleanup_file, download_pdf, highlight_chunks_in_pdf
 
 
@@ -41,27 +41,27 @@ async def test_download_pdf_success(tmp_path):
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
+    with patch("src.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
         path = await download_pdf("https://example.com/sample.pdf")
 
     assert os.path.exists(path)
-    assert open(path, "rb").read() == pdf_bytes
+    with open(path, "rb") as f:
+        assert f.read() == pdf_bytes
     cleanup_file(path)
 
 
 @pytest.mark.asyncio
-async def test_download_pdf_raises_http_exception_on_error():
+async def test_download_pdf_raises_on_error():
     mock_client = AsyncMock()
     mock_client.get = AsyncMock(side_effect=Exception("connection refused"))
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
-        with pytest.raises(HTTPException) as exc_info:
+    with patch("src.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
+        with pytest.raises(PDFDownloadError) as exc_info:
             await download_pdf("https://example.com/bad.pdf")
 
-    assert exc_info.value.status_code == 400
-    assert "Failed to download PDF" in exc_info.value.detail
+    assert "Failed to download PDF" in str(exc_info.value)
 
 
 @pytest.mark.asyncio
@@ -80,9 +80,9 @@ async def test_download_pdf_cleans_up_temp_file_on_error():
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
-        with patch("utils.pdf_helpers.tempfile.NamedTemporaryFile", side_effect=tracking_named_temp):
-            with pytest.raises(HTTPException):
+    with patch("src.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
+        with patch("src.utils.pdf_helpers.tempfile.NamedTemporaryFile", side_effect=tracking_named_temp):
+            with pytest.raises(PDFDownloadError):
                 await download_pdf("https://example.com/bad.pdf")
 
     for path in created_paths:
@@ -94,18 +94,16 @@ async def test_download_pdf_cleans_up_temp_file_on_error():
 # ---------------------------------------------------------------------------
 
 def test_highlight_chunks_raises_on_empty_documents(tmp_pdf):
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(NoDocumentsError) as exc_info:
         highlight_chunks_in_pdf(pdf_path=tmp_pdf, documents=[])
-    assert exc_info.value.status_code == 400
-    assert "No documents provided" in exc_info.value.detail
+    assert "No documents provided" in str(exc_info.value)
 
 
 def test_highlight_chunks_raises_when_pdf_not_found():
     doc = Document(page_content="some text", metadata={"page": 0})
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(PDFNotFoundError) as exc_info:
         highlight_chunks_in_pdf(pdf_path="/nonexistent/path.pdf", documents=[doc])
-    assert exc_info.value.status_code == 400
-    assert "PDF not found" in exc_info.value.detail
+    assert "PDF not found" in str(exc_info.value)
 
 
 def test_highlight_chunks_returns_valid_pdf_path(tmp_pdf):

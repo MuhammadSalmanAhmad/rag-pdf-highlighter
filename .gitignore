@@ -21,3 +21,12 @@ env/
 # Local env files
 .env
 .env.*
+
+# Build / packaging artifacts
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Debug artifacts
+debug_output/
