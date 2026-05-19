@@ -1,4 +1,4 @@
-# Callisto PDF Highlighter
+# RAG PDF Highlighter
 
 Highlight text chunks inside PDF documents — built for RAG pipelines.
 
