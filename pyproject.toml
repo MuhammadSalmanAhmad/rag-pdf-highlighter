@@ -42,9 +42,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/RipeSeed/calli-pdf-highlighter-"
-Repository = "https://github.com/RipeSeed/calli-pdf-highlighter-"
-Issues = "https://github.com/RipeSeed/calli-pdf-highlighter-/issues"
+Homepage = "https://github.com/MuhammadSalmanAhmad/rag-pdf-highlighter"
+Repository = "https://github.com/MuhammadSalmanAhmad/rag-pdf-highlighter"
+Issues = "https://github.com/MuhammadSalmanAhmad/rag-pdf-highlighter/issues"
 
 # ── Tool configuration ────────────────────────────────────────────
 
