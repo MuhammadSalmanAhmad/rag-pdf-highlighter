@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "callisto-pdf-highlighter"
 version = "0.1.0"
 authors = [
-  { name = "RipeSeed", email = "dev@ripeseed.io" },
+  { name = "Muhammad Salman Ahmad", email = "salman.ahmad@ripeseed.io" },
 ]
 description = "Highlight text chunks in PDFs – a FastAPI microservice for RAG pipelines"
 readme = "README.md"
