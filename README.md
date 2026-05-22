@@ -15,14 +15,14 @@ Given a PDF URL and a list of text chunks (with page numbers), this service loca
 ## Installation
 
 ```bash
-pip install callisto-pdf-highlighter
+pip install rag-pdf-highlighter
 ```
 
 Or install from source:
 
 ```bash
-git clone https://github.com/RipeSeed/calli-pdf-highlighter-.git
-cd calli-pdf-highlighter-
+git clone https://github.com/MuhammadSalmanAhmad/rag-pdf-highlighter.git
+cd rag-pdf-highlighter
 pip install -e ".[dev]"
 ```
 
