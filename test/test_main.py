@@ -2,8 +2,8 @@ from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
-from src.exceptions import NoDocumentsError, PDFDownloadError
-from src.main import app
+from rag_pdf_highlighter.exceptions import NoDocumentsError, PDFDownloadError
+from rag_pdf_highlighter.main import app
 
 client = TestClient(app)
 
@@ -31,9 +31,9 @@ VALID_PAYLOAD = {
 
 
 def test_highlight_returns_pdf(tmp_pdf):
-    with patch("src.main.download_pdf", new_callable=AsyncMock, return_value=tmp_pdf):
-        with patch("src.main.highlight_chunks_in_pdf", return_value=tmp_pdf):
-            with patch("src.main.cleanup_file"):
+    with patch("rag_pdf_highlighter.main.download_pdf", new_callable=AsyncMock, return_value=tmp_pdf):
+        with patch("rag_pdf_highlighter.main.highlight_chunks_in_pdf", return_value=tmp_pdf):
+            with patch("rag_pdf_highlighter.main.cleanup_file"):
                 response = client.post("/highlight", json=VALID_PAYLOAD)
 
     assert response.status_code == 200
@@ -43,7 +43,7 @@ def test_highlight_returns_pdf(tmp_pdf):
 
 def test_highlight_returns_400_on_download_failure():
     with patch(
-        "src.main.download_pdf",
+        "rag_pdf_highlighter.main.download_pdf",
         new_callable=AsyncMock,
         side_effect=PDFDownloadError("Failed to download PDF: connection refused"),
     ):
@@ -56,12 +56,12 @@ def test_highlight_returns_400_on_download_failure():
 def test_highlight_returns_400_on_empty_documents():
     payload = {**VALID_PAYLOAD, "documents": []}
 
-    with patch("src.main.download_pdf", new_callable=AsyncMock, return_value="/tmp/fake.pdf"):
+    with patch("rag_pdf_highlighter.main.download_pdf", new_callable=AsyncMock, return_value="/tmp/fake.pdf"):
         with patch(
-            "src.main.highlight_chunks_in_pdf",
+            "rag_pdf_highlighter.main.highlight_chunks_in_pdf",
             side_effect=NoDocumentsError("No documents provided"),
         ):
-            with patch("src.main.cleanup_file"):
+            with patch("rag_pdf_highlighter.main.cleanup_file"):
                 response = client.post("/highlight", json=payload)
 
     assert response.status_code == 400
@@ -69,7 +69,7 @@ def test_highlight_returns_400_on_empty_documents():
 
 
 def test_highlight_returns_500_on_unexpected_error():
-    with patch("src.main.download_pdf", new_callable=AsyncMock, side_effect=RuntimeError("unexpected")):
+    with patch("rag_pdf_highlighter.main.download_pdf", new_callable=AsyncMock, side_effect=RuntimeError("unexpected")):
         response = client.post("/highlight", json=VALID_PAYLOAD)
 
     assert response.status_code == 500

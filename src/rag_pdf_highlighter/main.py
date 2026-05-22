@@ -6,8 +6,8 @@ from fastapi.responses import FileResponse
 from langchain_core.documents import Document
 from pydantic import BaseModel, Field
 
-from src.exceptions import HighlightError, PDFDownloadError
-from src.utils.pdf_helpers import cleanup_file, download_pdf, highlight_chunks_in_pdf
+from rag_pdf_highlighter.exceptions import HighlightError, PDFDownloadError
+from rag_pdf_highlighter.utils.pdf_helpers import cleanup_file, download_pdf, highlight_chunks_in_pdf
 
 # ── Configure logging ──────────────────────────────────────────────
 logging.basicConfig(

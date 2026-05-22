@@ -10,15 +10,12 @@ RUN apt-get update && \
     libmupdf-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better Docker layer caching
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
+# Copy application code and install from pyproject.toml
 COPY . .
+RUN pip install --no-cache-dir .
 
 # Expose the port Uvicorn will listen on
 EXPOSE 8000
 
 # Run with Uvicorn
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "rag_pdf_highlighter.main:app", "--host", "0.0.0.0", "--port", "8000"]

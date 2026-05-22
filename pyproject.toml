@@ -3,7 +3,7 @@ requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "callisto-pdf-highlighter"
+name = "rag-pdf-highlighter"
 version = "0.1.0"
 authors = [
   { name = "Muhammad Salman Ahmad", email = "salman.ahmad@ripeseed.io" },
@@ -49,8 +49,13 @@ Issues = "https://github.com/MuhammadSalmanAhmad/rag-pdf-highlighter/issues"
 # ── Tool configuration ────────────────────────────────────────────
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["src*"]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rag_pdf_highlighter = ["py.typed"]
+
+[project.scripts]
+rag-pdf-highlighter = "rag_pdf_highlighter.main:app"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

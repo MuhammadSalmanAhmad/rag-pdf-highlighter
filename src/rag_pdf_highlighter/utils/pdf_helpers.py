@@ -16,7 +16,7 @@ import fitz
 import httpx
 from langchain_core.documents import Document
 
-from src.exceptions import NoDocumentsError, PDFDownloadError, PDFNotFoundError
+from rag_pdf_highlighter.exceptions import NoDocumentsError, PDFDownloadError, PDFNotFoundError
 
 logger = logging.getLogger("highlight-service.pdf_helpers")
 
