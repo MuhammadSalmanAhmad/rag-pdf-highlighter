@@ -31,7 +31,7 @@ pip install -e ".[dev]"
 ### As a microservice
 
 ```bash
-uvicorn src.main:app --host 0.0.0.0 --port 8000
+uvicorn rag_pdf_highlighter.main:app --host 0.0.0.0 --port 8000
 ```
 
 Then send a POST request:
@@ -54,15 +54,15 @@ curl -X POST http://localhost:8000/highlight \
 ### With Docker
 
 ```bash
-docker build -t callisto-pdf-highlighter .
-docker run -p 8000:8000 callisto-pdf-highlighter
+docker build -t rag-pdf-highlighter .
+docker run -p 8000:8000 rag-pdf-highlighter
 ```
 
 ### As a library
 
 ```python
 from langchain_core.documents import Document
-from src.utils.pdf_helpers import highlight_chunks_in_pdf
+from rag_pdf_highlighter.utils.pdf_helpers import highlight_chunks_in_pdf
 
 documents = [
     Document(page_content="Text to find", metadata={"page": 0}),

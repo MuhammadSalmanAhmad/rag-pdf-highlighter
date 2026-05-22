@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from langchain_core.documents import Document
 
-from src.exceptions import NoDocumentsError, PDFDownloadError, PDFNotFoundError
-from src.utils.pdf_helpers import cleanup_file, download_pdf, highlight_chunks_in_pdf
+from rag_pdf_highlighter.exceptions import NoDocumentsError, PDFDownloadError, PDFNotFoundError
+from rag_pdf_highlighter.utils.pdf_helpers import cleanup_file, download_pdf, highlight_chunks_in_pdf
 
 
 # ---------------------------------------------------------------------------
@@ -41,7 +41,7 @@ async def test_download_pdf_success(tmp_path):
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("src.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
+    with patch("rag_pdf_highlighter.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
         path = await download_pdf("https://example.com/sample.pdf")
 
     assert os.path.exists(path)
@@ -57,7 +57,7 @@ async def test_download_pdf_raises_on_error():
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("src.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
+    with patch("rag_pdf_highlighter.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
         with pytest.raises(PDFDownloadError) as exc_info:
             await download_pdf("https://example.com/bad.pdf")
 
@@ -80,8 +80,8 @@ async def test_download_pdf_cleans_up_temp_file_on_error():
     mock_client.__aenter__ = AsyncMock(return_value=mock_client)
     mock_client.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("src.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
-        with patch("src.utils.pdf_helpers.tempfile.NamedTemporaryFile", side_effect=tracking_named_temp):
+    with patch("rag_pdf_highlighter.utils.pdf_helpers.httpx.AsyncClient", return_value=mock_client):
+        with patch("rag_pdf_highlighter.utils.pdf_helpers.tempfile.NamedTemporaryFile", side_effect=tracking_named_temp):
             with pytest.raises(PDFDownloadError):
                 await download_pdf("https://example.com/bad.pdf")
 
