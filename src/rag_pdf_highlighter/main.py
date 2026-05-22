@@ -19,7 +19,7 @@ logger = logging.getLogger("highlight-service")
 app = FastAPI(
     title="Callisto PDF Highlighter",
     description="Highlight text chunks in PDFs for RAG pipelines",
-    version="0.1.0",
+    version="0.1.1",
 )
 
 
