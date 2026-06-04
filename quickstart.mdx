@@ -1,0 +1,65 @@
+---
+title: Quickstart
+description: Run the highlighter as a service, with Docker, or as a Python library
+---
+
+## Install
+
+```bash
+pip install rag-pdf-highlighter
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/MuhammadSalmanAhmad/rag-pdf-highlighter.git
+cd rag-pdf-highlighter
+pip install -e ".[dev]"
+```
+
+## Run the API locally
+
+```bash
+uvicorn rag_pdf_highlighter.main:app --host 0.0.0.0 --port 8000
+```
+
+## Highlight a PDF from a URL
+
+```bash
+curl -X POST http://localhost:8000/highlight \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pdf_url": "https://example.com/report.pdf",
+    "documents": [
+      {
+        "page_content": "Text to highlight in the PDF",
+        "metadata": {"page": 0}
+      }
+    ]
+  }' \
+  --output highlighted.pdf
+```
+
+## Docker
+
+```bash
+docker build -t rag-pdf-highlighter .
+docker run -p 8000:8000 rag-pdf-highlighter
+```
+
+## Use as a library
+
+```python
+from langchain_core.documents import Document
+from rag_pdf_highlighter.utils.pdf_helpers import highlight_chunks_in_pdf
+
+documents = [
+    Document(page_content="Text to find", metadata={"page": 0}),
+]
+
+output_path = highlight_chunks_in_pdf(
+    pdf_path="./report.pdf",
+    documents=documents,
+)
+print(f"Highlighted PDF saved to: {output_path}")
+```

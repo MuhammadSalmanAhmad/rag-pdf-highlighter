@@ -1,0 +1,20 @@
+---
+title: Introduction
+description: Highlight text chunks in PDFs for RAG pipelines
+---
+
+RAG PDF Highlighter locates text chunks (with page numbers) inside a PDF and returns an annotated copy with highlights applied.
+
+## Features
+
+- **3-tier text matching** — exact, sentence, then collapsed-whitespace fallback
+- **Async PDF download** — non-blocking I/O via `httpx`
+- **Stateless** — temp files are cleaned up after every request
+- **Docker-ready** — single-command container deployment
+- **Library-friendly** — core logic works without FastAPI
+
+## Use cases
+
+- RAG pipelines that need visual proof of which chunks map to which PDF regions
+- Reviewing retrieval quality on source documents
+- Sharing highlighted PDFs with stakeholders
