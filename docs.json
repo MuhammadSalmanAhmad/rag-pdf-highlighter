@@ -1,0 +1,22 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "RAG PDF Highlighter",
+  "theme": "mint",
+  "colors": {
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting started",
+        "pages": ["index", "quickstart"]
+      },
+      {
+        "group": "API",
+        "pages": ["api-reference"]
+      }
+    ]
+  }
+}
