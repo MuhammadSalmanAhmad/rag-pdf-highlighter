@@ -14,8 +14,8 @@ RUN apt-get update && \
 COPY . .
 RUN pip install --no-cache-dir .
 
-# Expose the port Uvicorn will listen on
+ENV PORT=8000
 EXPOSE 8000
 
-# Run with Uvicorn
-CMD ["uvicorn", "rag_pdf_highlighter.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run with Uvicorn — must bind 0.0.0.0, not 127.0.0.1
+CMD ["sh", "-c", "exec uvicorn rag_pdf_highlighter.main:app --host 0.0.0.0 --port ${PORT}"]
